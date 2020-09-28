@@ -16,7 +16,7 @@ def render(template_name, **kwargs):
         # Читаем
         template = Template(f.read())
     # рендерим шаблон с параметрами
-    return template.render(**kwargs)
+    return template.render(**kwargs).encode(encoding='utf-8')
 
 
 if __name__ == '__main__':
