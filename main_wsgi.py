@@ -1,5 +1,6 @@
-from my_wsgl.urls import urls
-from my_wsgl.controller import view_404, Request, secret_middleware
+from urls import urls
+from controller import view_404, Request
+from utilities import middlewares, parse_input_data, get_wsgi_input_data, parse_wsgi_input_data
 
 
 class Application:
@@ -25,9 +26,26 @@ class Application:
         for item in self.middlewares:
             item(request)
 
+        # получаем параметры запроса
+        query_string = environ['QUERY_STRING']
+
+        # Метод которым отправили запрос
+        method = environ['REQUEST_METHOD']
+
+        request_params = None
+
+        if method == 'GET':
+            # превращаем параметры в словарь
+            request_params = parse_input_data(query_string)
+        elif method == 'POST':
+            # получаем данные
+            data = get_wsgi_input_data(environ)
+            # превращаем данные в словарь
+            request_params = parse_wsgi_input_data(data)
+
         if url in self.urls:
             view = self.urls[url]
-            response = view(request)
+            response = view(request, method, request_params)
         else:
             response = view_404(request)
         start_response(response.code, [('Content-Type', 'text/html')])
@@ -35,7 +53,4 @@ class Application:
         return response.body
 
 
-middlewares = [
-    secret_middleware,
-]
 application = Application(urls, middlewares)
