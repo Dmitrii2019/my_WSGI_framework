@@ -1,5 +1,10 @@
-{% extends "./base/base.html" %}
-{% block title %}Index{% endblock %}
+{% extends 'base/base.html' %}
+{% include 'include/inc_menu.html' %}
+{% block title %}
+    {% for data in object_list %}
+        {{data.title}}
+    {% endfor %}
+{% endblock %}
 {% block head %}
     {{ super() }}
     <style type="text/css">
@@ -7,8 +12,8 @@
     </style>
 {% endblock %}
 {% block content %}
-    <h1>Index</h1>
+    <h1>{{ self.title() }}</h1>
     <p class="important">
-      Welcome to my awesome homepage.
+      Текст о Нас.
     </p>
 {% endblock %}
