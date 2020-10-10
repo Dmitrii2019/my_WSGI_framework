@@ -45,6 +45,25 @@ def parse_wsgi_input_data(data: bytes) -> dict:
     return result
 
 
+def get_data_method(environ):
+    # Метод которым отправили запрос
+    method = environ['REQUEST_METHOD']
+
+    # получаем параметры запроса
+    query_string = environ['QUERY_STRING']
+
+    request_params = None
+    if method == 'GET':
+        # превращаем параметры в словарь
+        request_params = parse_input_data(query_string)
+    elif method == 'POST':
+        # получаем данные
+        data = get_wsgi_input_data(environ)
+        # превращаем данные в словарь
+        request_params = parse_wsgi_input_data(data)
+    return method, request_params
+
+
 def secret_middleware(request):
     request.datas['data'] = 'Этот front controller'
 
