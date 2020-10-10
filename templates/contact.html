@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% for data in object_list %}{{data.title}}{% endfor %}</title>
-</head>
-<body>
-{% for data in object_list %}{{data.title}}
-<h2>{{data.content}}</h2>
-{% endfor %}
-<h2>Форма обратной связи.</h2>
-<form name="MyForm" action="/contact/" method="post" enctype="application/x-www-form-urlencoded">
-<p><input class="input" name="name" ENGINE="text" style="width:15%" /> Ваше имя*</p>
+{% extends "base/base.html" %}
+{% include 'include/inc_menu.html' %}
+{% block title %}
+    {% for data in object_list %}
+        {{data.title}}
+    {% endfor %}
+{% endblock %}
+{% block content %}
+    {% for data in object_list %}
+        {{data.content}}
+    {% endfor %}
+    <h2>Форма обратной связи.</h2>
+    <form name="MyForm" action="/contact/" method="post" enctype="application/x-www-form-urlencoded">
+    <p><input class="input" name="name" ENGINE="text" style="width:15%" /> Ваше имя*</p>
 
-<p><input class="input" name="email" type="text" style="width:15%" /> Электронная почта*</p>
+    <p><input class="input" name="email" type="text" style="width:15%" /> Электронная почта*</p>
 
-<p><input class="input" name="sub" type="text" style="width:15%" /> Тема сообщения</p>
+    <p><input class="input" name="sub" type="text" style="width:15%" /> Тема сообщения</p>
 
-<p>Текст сообщения:<br /><textarea name="body" cols="1" rows="5" style="width:30%" /></textarea></p>
-<p><input id="submit" value="Отправить" type="submit" /></p>
-</form>
-</body>
-</html>
+    <p>Текст сообщения:<br /><textarea name="body" cols="1" rows="5" style="width:30%" /></textarea></p>
+    <p><input id="submit" value="Отправить" type="submit" /></p>
+    </form>
+{% endblock %}
