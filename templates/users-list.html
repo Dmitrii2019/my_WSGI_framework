@@ -1,0 +1,16 @@
+{% extends "base/base.html" %}
+{% block title %}
+Список пользователей
+{% endblock %}
+{% block body %}
+{% include "include/inc-menu.html" %}
+<h1>Список пользователей</h1>
+<ul>
+    {% for item in objects_list %}
+        {% if item.type_ == 'user' %}
+        <li>{{item.name}}</li>
+        <li>{{item.type_}}</li>
+        {% endif %}
+    {% endfor %}
+</ul>
+{% endblock %}
