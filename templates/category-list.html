@@ -6,10 +6,12 @@
 {% include "include/inc-menu.html" %}
 <h1>Список категорий</h1>
 <ul>
-    {% for item in objects_list %}
+    {% for items in objects_list %}
+        {% for item in items.category %}
     <li>
-        {{item.name}} <span>Количество курсов: {{item.course_count()}}</span>
+            {{item[0]}} <span>Количество курсов: </span>
     </li>
+        {% endfor %}
     {% endfor %}
 </ul>
 {% endblock %}

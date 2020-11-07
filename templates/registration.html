@@ -60,25 +60,23 @@
 <form method="post" action="/registration-form/" style="max-width:500px;margin:auto">
   <h2>Форма регистрации</h2>
   <div class="input-container">
-    <select name="type_">
+    <select name="user_type">
     <option value="user">Пользователь</option>
     <option value="student">Студент</option>
     <option value="teacher">Учитель</option>
    </select>
   </div>
   <div class="input-container">
-    <i class="fa fa-user icon"></i>
-    <input class="input-field" type="text" placeholder="Имя" name="usrnm">
+    <input class="input-field" type="text" placeholder="Имя" name="firstname">
   </div>
-
   <div class="input-container">
-    <i class="fa fa-envelope icon"></i>
+    <input class="input-field" type="text" placeholder="Фамилия" name="lastname">
+  </div>
+  <div class="input-container">
     <input class="input-field" type="text" placeholder="Email" name="email">
   </div>
-
   <div class="input-container">
-    <i class="fa fa-key icon"></i>
-    <input class="input-field" type="password" placeholder="Password" name="psw">
+    <input class="input-field" type="password" placeholder="Password" name="password">
   </div>
 
   <button type="submit" class="btn">Register</button>
