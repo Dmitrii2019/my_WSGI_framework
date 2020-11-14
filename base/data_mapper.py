@@ -1,10 +1,10 @@
 import copy
-import os
 import sqlite3
 import threading
 
-path = os.getcwd()
-connection = sqlite3.connect(f'{path}/database.db')
+from setting import BASE
+
+connection = sqlite3.connect(BASE)
 
 
 class RecordNotFoundException(Exception):
@@ -112,7 +112,7 @@ class CategoryMapper:
         self.cursor.execute(statement, (id, ))
         result = self.cursor.fetchone()
         if result:
-            return Category(*result)
+            return result
         else:
             raise RecordNotFoundException(f'record with id={id} not found')
 
@@ -129,7 +129,7 @@ class CategoryMapper:
     # редактирование записей
     def update(self, category):
         statement = f"UPDATE CATEGORY SET NAME=? WHERE ID=?"
-        self.cursor.execute(statement, (category.name, category.id))
+        self.cursor.execute(statement, (category.name))
         try:
             self.connection.commit()
         except Exception as e:
@@ -169,7 +169,7 @@ class CourseMapper:
 
     # чтение записей по id
     def find_by_id(self, id):
-        statement = f"SELECT ID, CATEGORY, NAME, FORM_COURSE, TYPE_COURSE FROM COURSE WHERE ID=?"
+        statement = f"SELECT CATEGORY, NAME, FORM_COURSE, TYPE_COURSE FROM COURSE WHERE ID=?"
         self.cursor.execute(statement, (id,))
         result = self.cursor.fetchone()
         if result:
@@ -179,7 +179,7 @@ class CourseMapper:
 
     # чтение всех записей
     def get(self):
-        statement = f"SELECT name FROM COURSE ORDER BY id "
+        statement = f"SELECT category, name, form_course, type_course FROM COURSE ORDER BY id "
         self.cursor.execute(statement)
         result = self.cursor.fetchall()
         if result:
@@ -305,22 +305,16 @@ class Person(DomainObject):
 
 
 class Category(DomainObject):
-    def __init__(self, id, name):
-        self.id = id
+    def __init__(self, name):
         self.name = name
 
 
 class Course(DomainObject):
-    def __init__(self, id, category, name, form_course, type_course):
-        self.id = id
+    def __init__(self, category, name, form_course, type_course):
         self.category = category
         self.name = name
         self.form_course = form_course
         self.type_course = type_course
-
-    def clone(self):
-        """Clone a registered object and update inner attributes dictionary"""
-        return copy.deepcopy(self)
 
 
 class InteractiveCourse(Course):
@@ -375,29 +369,33 @@ class TrainingSite:
         obj.mark_dirty()
         UnitOfWork.get_current().commit()
 
-    # @staticmethod
-    # def delete(type_, id):
-    #     return GetMapper.get_mapper_type(type_).delete(id)
+    @staticmethod
+    def get_copy(name, *args):
+        pass
+
+    @staticmethod
+    def delete(type_, id):
+        pass
 
 
 if __name__ == '__main__':
     site = TrainingSite
-    site.create('Person', 15, 'Fedorov', 'Fedor', 'student', 'email@email.ru', '123456789')
-    site.create('Category', 3, 'C++')
-    site.create('Course', 1, 'C++', 'C++ - начальный курс', 'online', 'webinar')
+    site.create('Person', None, 'Fedorov', 'Fedor', 'student', 'email@email.ru', '123456789')
+    site.create('Category', 'new')
+    site.create('Course', 'C++', 'C++ - начальный курс', 'online', 'webinar')
 
     print(site.get('Person'))
     print(site.get('Category'))
     print(site.get('Course'))
-    #
-    print(site.find_by_id('Person', 1).firstname)
-    print(site.find_by_id('Category', 1).name)
-    print(site.find_by_id('Course', 1).name)
-    #
-    site.update('Person', 1, 'Ivanov_new', 'Ivan_new', 'user', 'email@email.ru', '123456789')
-    site.update('Category', 1, 'C#')
-    site.update('Course', 1, 'C++', 'C++ - начальный курс new', 'online', 'webinar')
 
+    print(site.find_by_id('Person', 1).firstname)
+    print(site.find_by_id('Category', 1))
+    print(site.find_by_id('Course', 1).name)
+
+    site.update('Person', 1, 'Ivanov_new', 'Ivan_new', 'user', 'email@email.ru', '123456789')
+    site.update('Category', 'C#')
+    site.update('Course', 'C++', 'C++ - начальный курс new', 'online', 'webinar')
+    #
     # site.delete('Person', 5)
 
 

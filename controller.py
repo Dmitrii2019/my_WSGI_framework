@@ -1,7 +1,6 @@
-from base.create_bd import cursor
 from base.data_mapper import TrainingSite
 from decorators.debug import debug
-from wavy.setting import OK, NOT_FOUND, REDIRECT
+from setting import OK, NOT_FOUND, REDIRECT
 from wavy.template import render
 from wavy.utilities import Response
 
@@ -17,13 +16,14 @@ def main_view(request, method, request_params):
 def registration_view(request, method, request_params):
     title = 'Регистрации'
     if method == 'POST':
-        id = 0
+        type_ = 'Person'
+        id = None
         user_type = request_params["user_type"]
         lastname = request_params["lastname"]
         firstname = request_params["firstname"]
         email = request_params["email"]
         password = request_params["password"]
-        site.create(id, lastname, firstname, user_type, email, password)
+        site.create(type_, id, lastname, firstname, user_type, email, password)
     return Response(OK, [render('registration.html', objects_list=[{'title': title}])])
 
 
@@ -43,15 +43,7 @@ def teachers_list(request, method, request_params):
 def create_category_view(request, method, request_params):
     if method == 'POST':
         # метод пост
-        data = request_params
-        name = data['name']
-        category_id = 1
-
-        category = None
-        if category_id:
-            category = site.find_by_id('Category', int(category_id))
-
-        site.create('Category', category_id, name)
+        site.create('Category', request_params['name'])
         return Response(OK, [render('create-category.html')])
     else:
         categories = site.get('Category')
@@ -62,16 +54,12 @@ def create_category_view(request, method, request_params):
 def create_course_view(request, method, request_params):
     if method == 'POST':
         # метод пост
-        data = request_params
-        name = data['name']
-        form_course = data['form_course']
-        type_course = data['type_course']
-        category_id = 1
-        category = None
-        if category_id:
-            # category = site.find_by_id('Course', int(category_id))
-            category = 'Python'
-            course = site.create('Course', 5, category, name, form_course, type_course)
+        name = request_params['name']
+        form_course = request_params['form_course']
+        type_course = request_params['type_course']
+        category_name = request_params['category_name']
+        if category_name:
+            course = site.create('Course', category_name, name, form_course, type_course)
         else:
             # редирект
             return Response(REDIRECT, [render('create-category.html')])
@@ -98,15 +86,10 @@ def course_list(request, method, request_params):
 
 @debug
 def copy_course(request, method, request_params):
-    id = 1
     name = request_params['name']
-    print(name)
-    old_course = site.find_by_id('Course', id)
+    old_course = site.get('Course')
     if old_course:
-        new_name = f'copy_{name}'
-        new_course = old_course.clone()
-        new_course.name = new_name
-
+        site.get_copy(name, old_course)
     return Response(OK, [render('course-list.html', objects_list=site.get('Course'))])
 
 

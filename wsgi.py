@@ -1,5 +1,6 @@
 from controller import urls
 from controller import view_404
+from setting import OK
 from wavy.utilities import middlewares, get_data_method, Request
 
 
@@ -20,7 +21,7 @@ class Application:
         request = Request()
 
         # Проверка на / в конце урла, если нет добовляем
-        if url[-1] != '/' and len(url) > 1:
+        if not url.endswith('/') and url != '/':
             url += '/'
 
         for item in self.middlewares:
@@ -53,7 +54,7 @@ class LoggingApplication(Application):
 class FakeApplication:
 
     def __call__(self, environ, start_response):
-        start_response = ('200', [('Content-Type', 'text/html')])
+        start_response = (OK, [('Content-Type', 'text/html')])
         return [b'Hello from Fake']
 
 

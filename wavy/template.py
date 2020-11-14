@@ -4,6 +4,8 @@
 from jinja2 import FileSystemLoader
 from jinja2.environment import Environment
 
+from setting import ENCODING
+
 
 def render(template_name, folder='templates', **kwargs):
     """
@@ -18,4 +20,4 @@ def render(template_name, folder='templates', **kwargs):
     env.loader = FileSystemLoader(folder)
     # находим шаблон в окружении
     template = env.get_template(template_name)
-    return template.render(**kwargs).encode(encoding='utf-8')
+    return template.render(**kwargs).encode(encoding=ENCODING)

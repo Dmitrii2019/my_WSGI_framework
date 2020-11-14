@@ -1,3 +1,6 @@
+from setting import ENCODING
+
+
 class Response:
     def __init__(self, code, body):
         self.code = code
@@ -35,7 +38,7 @@ def parse_wsgi_input_data(data: bytes) -> dict:
     result = {}
     if data:
         # декодируем данные
-        data_str = data.decode(encoding='utf-8')
+        data_str = data.decode(encoding=ENCODING)
         # собираем их в словарь
         result = parse_input_data(data_str)
     return result

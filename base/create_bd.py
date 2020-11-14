@@ -1,8 +1,8 @@
 import sqlite3
-import os.path
 
-path = os.getcwd()
-connection = sqlite3.connect(f'{path}/database.db')
+from setting import BASE
+
+connection = sqlite3.connect(BASE)
 cursor = connection.cursor()
 
 # удаляем таблицу
