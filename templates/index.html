@@ -1,0 +1,12 @@
+{% extends "base/base.html" %}
+{% include 'include/inc-menu.html' %}
+{% block title %}
+    {% for data in objects_list %}
+        {{data.title}}
+    {% endfor %}
+{% endblock %}
+{% block head %}
+{% endblock %}
+{% block body %}
+<h1>{{ self.title() }}</h1>
+{% endblock %}

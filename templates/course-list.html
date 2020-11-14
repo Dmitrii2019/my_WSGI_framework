@@ -1,0 +1,15 @@
+{% extends "base/base.html" %}
+{% block title %}
+Список курсов
+{% endblock %}
+{% block body %}
+{% include "include/inc-menu.html" %}
+<h1>Список курсов</h1>
+<ul>
+    {% for item in objects_list %}
+    <li>
+        {{item[1]}} <span><a href="/copy-course/?name={{item[1]}}">скопировать</a></span>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
