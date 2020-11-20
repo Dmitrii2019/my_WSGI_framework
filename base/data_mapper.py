@@ -40,8 +40,10 @@ class PersonMapper:
     # CRUD
     # создание записей
     def insert(self, person):
-        statement = f"INSERT INTO PERSON (FIRSTNAME, LASTNAME, USER_TYPE, EMAIL, PASSWORD) VALUES (?, ?, ?, ?, ?)"
-        self.cursor.execute(statement, (person.firstname, person.lastname, person.user_type, person.email, person.password))
+        statement = f"INSERT INTO PERSON (FIRSTNAME, LASTNAME, USER_TYPE, COURSE, EMAIL, PASSWORD) VALUES " \
+                    f"(?, ?, ?, ?, ?, ?)"
+        self.cursor.execute(statement, (person.firstname, person.lastname, person.user_type, person.course,
+                                        person.email, person.password))
         try:
             self.connection.commit()
         except Exception as e:
@@ -49,7 +51,7 @@ class PersonMapper:
 
     # чтение записей по id
     def find_by_id(self, id):
-        statement = f"SELECT id, lastname, firstname, user_type, email, password FROM PERSON WHERE ID=?"
+        statement = f"SELECT ID, LASTNAME, FIRSTNAME, USER_TYPE, COURSE, EMAIL, PASSWORD FROM PERSON WHERE ID=?"
         self.cursor.execute(statement, (id,))
         result = self.cursor.fetchone()
         if result:
@@ -59,18 +61,21 @@ class PersonMapper:
 
     # чтение всех записей
     def get(self):
-        statement = f"SELECT id, lastname, firstname, user_type, email, password FROM PERSON ORDER BY id "
+        statement = f"SELECT ID, LASTNAME, FIRSTNAME, USER_TYPE, COURSE, EMAIL, PASSWORD FROM PERSON ORDER BY ID "
         self.cursor.execute(statement)
-        result = self.cursor.fetchall()
-        if result:
+        results = self.cursor.fetchall()
+        result = []
+        try:
+            for data in results:
+                result.append(Person(*data))
             return result
-        else:
-            raise RecordNotFoundException(f'no users')
-        
+        except Exception as e:
+            raise RecordNotFoundException(f'no person')
+
     # редактирование записей
     def update(self, person):
-        statement = f"UPDATE PERSON SET FIRSTNAME=?, LASTNAME=?, USER_TYPE=? WHERE ID=?"
-        self.cursor.execute(statement, (person.firstname, person.lastname, person.user_type, person.id))
+        statement = f"UPDATE PERSON SET FIRSTNAME=?, LASTNAME=?, USER_TYPE=?, COURSE=? WHERE ID=?"
+        self.cursor.execute(statement, (person.firstname, person.lastname, person.user_type, person.course, person.id))
         try:
             self.connection.commit()
         except Exception as e:
@@ -99,8 +104,8 @@ class CategoryMapper:
     # CRUD
     # создание записей
     def insert(self, category):
-        statement = f"INSERT INTO CATEGORY (NAME) VALUES (?)"
-        self.cursor.execute(statement, (category.name, ))
+        statement = f"INSERT INTO CATEGORY (NAME, COURSE) VALUES (?, ?)"
+        self.cursor.execute(statement, (category.name, category.course))
         try:
             self.connection.commit()
         except Exception as e:
@@ -108,28 +113,31 @@ class CategoryMapper:
 
     # чтение записей по id
     def find_by_id(self, id):
-        statement = f"SELECT id, name FROM CATEGORY WHERE ID=?"
+        statement = f"SELECT ID, NAME, COURSE FROM CATEGORY WHERE ID=?"
         self.cursor.execute(statement, (id, ))
         result = self.cursor.fetchone()
         if result:
-            return result
+            return Category(*result)
         else:
             raise RecordNotFoundException(f'record with id={id} not found')
 
     # чтение всех записей
     def get(self):
-        statement = f"SELECT name FROM CATEGORY ORDER BY id "
+        statement = f"SELECT ID, NAME, COURSE FROM CATEGORY ORDER BY ID "
         self.cursor.execute(statement)
-        result = self.cursor.fetchall()
-        if result:
+        results = self.cursor.fetchall()
+        result = []
+        try:
+            for data in results:
+                result.append(Category(*data))
             return result
-        else:
+        except Exception as e:
             raise RecordNotFoundException(f'no category')
 
     # редактирование записей
     def update(self, category):
-        statement = f"UPDATE CATEGORY SET NAME=? WHERE ID=?"
-        self.cursor.execute(statement, (category.name))
+        statement = f"UPDATE CATEGORY SET NAME=?, COURSE=? WHERE ID=?"
+        self.cursor.execute(statement, (category.name, category.course, category.id))
         try:
             self.connection.commit()
         except Exception as e:
@@ -159,9 +167,9 @@ class CourseMapper:
     # создание записей
     def insert(self, course):
         statement = f"INSERT INTO COURSE " \
-                    f"(CATEGORY, NAME, FORM_COURSE, TYPE_COURSE) " \
-                    f"VALUES (?, ?, ?, ?)"
-        self.cursor.execute(statement, (course.category, course.name, course.form_course, course.type_course))
+                    f"(NAME, FORM_COURSE, TYPE_COURSE) " \
+                    f"VALUES (?, ?, ?)"
+        self.cursor.execute(statement, (course.name, course.form_course, course.type_course))
         try:
             self.connection.commit()
         except Exception as e:
@@ -169,8 +177,8 @@ class CourseMapper:
 
     # чтение записей по id
     def find_by_id(self, id):
-        statement = f"SELECT CATEGORY, NAME, FORM_COURSE, TYPE_COURSE FROM COURSE WHERE ID=?"
-        self.cursor.execute(statement, (id,))
+        statement = f"SELECT ID, NAME, FORM_COURSE, TYPE_COURSE FROM COURSE WHERE ID=?"
+        self.cursor.execute(statement, (id, ))
         result = self.cursor.fetchone()
         if result:
             return Course(*result)
@@ -179,18 +187,21 @@ class CourseMapper:
 
     # чтение всех записей
     def get(self):
-        statement = f"SELECT category, name, form_course, type_course FROM COURSE ORDER BY id "
+        statement = f"SELECT ID, NAME, FORM_COURSE, TYPE_COURSE FROM COURSE ORDER BY ID "
         self.cursor.execute(statement)
-        result = self.cursor.fetchall()
-        if result:
+        results = self.cursor.fetchall()
+        result = []
+        try:
+            for data in results:
+                result.append(Course(*data))
             return result
-        else:
+        except Exception as e:
             raise RecordNotFoundException(f'no course')
 
     # редактирование записей
     def update(self, course):
-        statement = f"UPDATE COURSE SET CATEGORY=?, NAME=?, FORM_COURSE=?, TYPE_COURSE=?"
-        self.cursor.execute(statement, (course.category, course.name, course.form_course, course.type_course))
+        statement = f"UPDATE COURSE SET NAME=?, FORM_COURSE=?, TYPE_COURSE=?"
+        self.cursor.execute(statement, (course.name, course.form_course, course.type_course))
         try:
             self.connection.commit()
         except Exception as e:
@@ -295,23 +306,26 @@ class DomainObject:
 
 
 class Person(DomainObject):
-    def __init__(self, id, lastname, firstname, user_type, email, password):
+    def __init__(self, id, lastname, firstname, user_type, course, email, password):
         self.id = id
         self.lastname = lastname
         self.firstname = firstname
         self.user_type = user_type
+        self.course = course
         self.email = email
         self.password = password
 
 
 class Category(DomainObject):
-    def __init__(self, name):
+    def __init__(self, id, name, course):
+        self.id = id
         self.name = name
+        self.course = course
 
 
 class Course(DomainObject):
-    def __init__(self, category, name, form_course, type_course):
-        self.category = category
+    def __init__(self, id, name, form_course, type_course):
+        self.id = id
         self.name = name
         self.form_course = form_course
         self.type_course = type_course
@@ -370,6 +384,38 @@ class TrainingSite:
         UnitOfWork.get_current().commit()
 
     @staticmethod
+    def add_course_to_category(category_id, course_id):
+        site = TrainingSite()
+        obj = site.find_by_id('Category', category_id)
+        name = obj.name
+        courses = obj.course
+        course_name = site.find_by_id('Course', course_id).name
+        if course_name not in courses:
+            course_name += f', {courses}'
+        else:
+            print('Курс уже добавлен')
+
+        site.update('Category', category_id, name, course_name)
+
+    @staticmethod
+    def add_person_to_course(person_id, course_id):
+        site = TrainingSite()
+        person = site.find_by_id('Person', person_id)
+        person_course = site.find_by_id('Person', person_id).course
+        course_name = site.find_by_id('Course', course_id).name
+        if person_course == 'no':
+            person_course = ''
+            person_course += f'{course_name}'
+
+        if course_name not in person_course:
+            person_course += f', {course_name}'
+        else:
+            print('Курс уже добавлен')
+
+        site.update('Person', person_id, person.lastname, person.firstname,
+                    person.user_type, person_course, person.email, person.password)
+
+    @staticmethod
     def get_copy(name, *args):
         pass
 
@@ -380,22 +426,20 @@ class TrainingSite:
 
 if __name__ == '__main__':
     site = TrainingSite
-    site.create('Person', None, 'Fedorov', 'Fedor', 'student', 'email@email.ru', '123456789')
-    site.create('Category', 'new')
-    site.create('Course', 'C++', 'C++ - начальный курс', 'online', 'webinar')
+    # print(site.find_by_id('Category', 1).name)
+    # print(site.find_by_id('Course', 1))
 
-    print(site.get('Person'))
-    print(site.get('Category'))
-    print(site.get('Course'))
-
-    print(site.find_by_id('Person', 1).firstname)
-    print(site.find_by_id('Category', 1))
-    print(site.find_by_id('Course', 1).name)
-
-    site.update('Person', 1, 'Ivanov_new', 'Ivan_new', 'user', 'email@email.ru', '123456789')
-    site.update('Category', 'C#')
-    site.update('Course', 'C++', 'C++ - начальный курс new', 'online', 'webinar')
+    # site.create('Category', 3, 'name', 'нет')
+    # site.create('Person', None, 'Fedorov', 'Fedor', 'student', 'email@email.ru', '123456789')
+    # site.create('Category', 'new')
+    # site.create('Course', 'C++', 'C++ - начальный курс', 'online', 'webinar')
     #
+    # print(site.get('Person'))
+    # print(site.get('Category'))
+    # print(site.get('Course'))
+    # site.update('Person', 1, 'Ivanov_new', 'Ivan_new', 'user', 'email@email.ru', '123456789')
+    # site.update('Category', 1, 'python', 'ner, курсы python для новичков')
+    # site.update('Course', 'C++', 'C++ - начальный курс new', 'online', 'webinar')
     # site.delete('Person', 5)
 
 

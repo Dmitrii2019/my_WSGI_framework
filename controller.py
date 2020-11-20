@@ -1,29 +1,40 @@
+from logging import log
+
 from base.data_mapper import TrainingSite
 from decorators.debug import debug
 from setting import OK, NOT_FOUND, REDIRECT
 from wavy.template import render
-from wavy.utilities import Response
+from wavy.utilities import Response, PrototypeMixin
 
 site = TrainingSite()
 
 
 @debug
 def main_view(request, method, request_params):
-    title = 'Главна'
-    return Response(OK, [render('index.html', objects_list=[{'title': title}])])
+    if method == 'POST':
+        if 'category' in request_params:
+            site.add_course_to_category(request_params['category'], request_params['course'])
+        elif 'person' in request_params:
+            site.add_person_to_course(request_params['person'], request_params['course'])
+
+    categories = site.get('Category')
+    course = site.get('Course')
+    student = site.get('Person')
+    return Response(OK, [render('index.html', objects_list=[
+                            {'categories': categories},
+                            {'course': course},
+                            {'student': student}])])
 
 
 def registration_view(request, method, request_params):
     title = 'Регистрации'
     if method == 'POST':
-        type_ = 'Person'
-        id = None
         user_type = request_params["user_type"]
         lastname = request_params["lastname"]
         firstname = request_params["firstname"]
         email = request_params["email"]
         password = request_params["password"]
-        site.create(type_, id, lastname, firstname, user_type, email, password)
+        site.create('Person', None, lastname, firstname, user_type, 'no', email, password)
     return Response(OK, [render('registration.html', objects_list=[{'title': title}])])
 
 
@@ -42,32 +53,23 @@ def teachers_list(request, method, request_params):
 @debug
 def create_category_view(request, method, request_params):
     if method == 'POST':
-        # метод пост
-        site.create('Category', request_params['name'])
-        return Response(OK, [render('create-category.html')])
-    else:
-        categories = site.get('Category')
-        return Response(OK, [render('create-category.html', categories=categories)])
+        site.create('Category', None, request_params['name'], 'нет')
+
+    categories = site.get('Category')
+    return Response(OK, [render('category.html', categories=categories)])
 
 
 @debug
 def create_course_view(request, method, request_params):
     if method == 'POST':
-        # метод пост
         name = request_params['name']
         form_course = request_params['form_course']
         type_course = request_params['type_course']
-        category_name = request_params['category_name']
-        if category_name:
-            course = site.create('Course', category_name, name, form_course, type_course)
-        else:
-            # редирект
-            return Response(REDIRECT, [render('create-category.html')])
+        if name:
+            site.create('Course', None, name, form_course, type_course)
 
-        return Response(OK, [render('create-course.html')])
-    else:
-        categories = site.get('Category')
-        return Response(OK, [render('create-course.html', categories=categories)])
+    course = site.get('Course')
+    return Response(OK, [render('course.html', course=course)])
 
 
 @debug
@@ -80,39 +82,32 @@ def contact_view(request, method, request_params):
 
 
 @debug
-def course_list(request, method, request_params):
-    return Response(OK, [render('course-list.html', objects_list=site.get('Course'))])
-
-
-@debug
 def copy_course(request, method, request_params):
-    name = request_params['name']
-    old_course = site.get('Course')
+    id = request_params['id']
+    try:
+        old_course = site.find_by_id('Course', id)
+    except Exception as e:
+        return view_404(request)
+
     if old_course:
-        site.get_copy(name, old_course)
-    return Response(OK, [render('course-list.html', objects_list=site.get('Course'))])
-
-
-@debug
-def category_list(request, method, request_params):
-    category = site.get('Category')
-    course = site.get('Course')
-    return Response(OK, [render('category-list.html', objects_list=[{'category': category}, {'course': course}])])
+        new_name = f'copy_{old_course.name}'
+        new_course = PrototypeMixin.clone(old_course)
+        new_course.name = new_name
+        site.create('Course', None, new_course.name, new_course.form_course, new_course.type_course)
+    return Response(OK, [render('course.html', course=site.get('Course'))])
 
 
 @debug
 def view_404(request):
     title = 'Not_Found'
-    return Response(NOT_FOUND, [render('index.html', objects_list=[{'title': title}])])
+    return Response(NOT_FOUND, [render('404.html', objects_list=[{'title': title}])])
 
 
 urls = {
     '/': main_view,
-    '/create-category/': create_category_view,
-    '/create-course/': create_course_view,
+    '/category/': create_category_view,
+    '/course/': create_course_view,
     '/contact/': contact_view,
-    '/category-list/': category_list,
-    '/course-list/': course_list,
     '/copy-course/': copy_course,
     '/registration-form/': registration_view,
     '/students-list/': students_list,

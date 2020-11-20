@@ -1,4 +1,14 @@
+# coding:utf8
+import copy
 from setting import ENCODING
+
+
+class PrototypeMixin:
+    # прототип
+
+    def clone(self):
+        """Clone a registered object and update inner attributes dictionary"""
+        return copy.deepcopy(self)
 
 
 class Response:
@@ -35,6 +45,7 @@ def get_wsgi_input_data(env) -> bytes:
 
 
 def parse_wsgi_input_data(data: bytes) -> dict:
+
     result = {}
     if data:
         # декодируем данные

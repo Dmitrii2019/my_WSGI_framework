@@ -7,12 +7,10 @@
 <h1>Список пользователей</h1>
 <ul>
     {% for item in objects_list %}
-        {% if item[3] == 'user' %}
-        <li>Фамилия - {{item[1]}}</li>
-        <li>Имя - {{item[2]}}</li>
-        <li>Тип - {{item[3]}}</li>
-        <li>email - {{item[4]}}</li><br>
-        {% endif %}
+        <li>Тип - {{item.user_type}}</li>
+        <li>Фамилия - {{item.lastname}}</li>
+        <li>Имя - {{item.firstname}}</li><br>
     {% endfor %}
 </ul>
+Добавить кнопки Удалить и Редактировать
 {% endblock %}

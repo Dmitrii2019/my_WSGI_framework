@@ -1,0 +1,19 @@
+{% extends "base/base.html" %}
+{% block title %}
+Создание курса
+{% endblock %}
+{% block body %}
+{% include "include/inc-menu.html" %}
+<h1>Создание категории</h1>
+<form method="post">
+    <input type="text" name="name" placeholder="Название">
+    <button type="submit">Сохранить</button>
+</form>
+<h2>Список категорий </h2>
+    <ul>
+        {% for item in categories %}
+            <li>Категория - {{item.name}} Курсы: {{item.course}}<br></li>
+        {% endfor %}
+    </ul>
+Добавить удаление Курса
+{% endblock %}
