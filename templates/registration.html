@@ -1,0 +1,86 @@
+{% extends "base/base.html" %}
+{% include 'include/inc-menu.html' %}
+{% block title %}
+    {% for data in objects_list %}
+        {{data.title}}
+    {% endfor %}
+{% endblock %}
+{% block head %}
+{% endblock %}
+{% block body %}
+<h1>{{ self.title() }}</h1>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Add icon library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+
+
+.input-container {
+    display: -ms-flexbox; /* IE10 */
+    display: flex;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.icon {
+    padding: 10px;
+    background: dodgerblue;
+    color: white;
+    min-width: 50px;
+    text-align: center;
+}
+
+.input-field {
+    width: 100%;
+    padding: 10px;
+    outline: none;
+}
+
+.input-field:focus {
+    border: 2px solid dodgerblue;
+}
+
+/* Set a style for the submit button */
+.btn {
+    background-color: dodgerblue;
+    color: white;
+    padding: 15px 20px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+}
+
+.btn:hover {
+    opacity: 1;
+}
+</style>
+</head>
+<body>
+<form method="post" action="/registration-form/" style="max-width:500px;margin:auto">
+  <h2>Форма регистрации</h2>
+  <div class="input-container">
+    <select name="user_type">
+    <option value="user">Пользователь</option>
+    <option value="student">Студент</option>
+    <option value="teacher">Учитель</option>
+   </select>
+  </div>
+  <div class="input-container">
+    <input class="input-field" type="text" placeholder="Имя" name="firstname">
+  </div>
+  <div class="input-container">
+    <input class="input-field" type="text" placeholder="Фамилия" name="lastname">
+  </div>
+  <div class="input-container">
+    <input class="input-field" type="text" placeholder="Email" name="email">
+  </div>
+  <div class="input-container">
+    <input class="input-field" type="password" placeholder="Password" name="password">
+  </div>
+
+  <button type="submit" class="btn">Register</button>
+</form>
+
+</body>
+{% endblock %}

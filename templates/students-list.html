@@ -1,0 +1,20 @@
+{% extends "base/base.html" %}
+{% block title %}
+Список студентов
+{% endblock %}
+{% block body %}
+{% include "include/inc-menu.html" %}
+<h1>Список студентов</h1>
+<ul>
+    {% for item in objects_list %}
+        {% if item.user_type == 'student' %}
+        <li>Фамилия - {{item.lastname}}</li>
+        <li>Имя - {{item.firstname}}</li>
+        <li>Тип - {{item.user_type}}</li>
+        <li>Курсы - {{item.course}}</li>
+        <li>email - {{item.email}}</li><br>
+        {% endif %}
+    {% endfor %}
+</ul>
+Добавить кнопки Удалить и Редактировать
+{% endblock %}

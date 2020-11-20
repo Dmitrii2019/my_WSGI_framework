@@ -1,0 +1,21 @@
+{% extends "base/base.html" %}
+{% block title %}
+Создание курса
+{% endblock %}
+{% block body %}
+{% include "include/inc-menu.html" %}
+<h1>Создание курса</h1>
+<form method="post">
+    <input type="text" name="name" placeholder="Название">
+    <input type="text" name="form_course" placeholder="Формат">
+    <input type="text" name="type_course" placeholder="Тип">
+    <button type="submit">Сохранить</button>
+</form>
+    <h2>Список курсов:</h2>
+    <ul>
+    {% for item in course %}
+        <li>{{item.name}} - <span><a href="/copy-course/?id={{item.id}}">скопировать</a></span></li>
+    {% endfor %}
+    </ul>
+Добавить удалить, редактировать курс
+{% endblock %}

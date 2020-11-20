@@ -1,0 +1,16 @@
+{% extends "base/base.html" %}
+{% block title %}
+Список пользователей
+{% endblock %}
+{% block body %}
+{% include "include/inc-menu.html" %}
+<h1>Список пользователей</h1>
+<ul>
+    {% for item in objects_list %}
+        <li>Тип - {{item.user_type}}</li>
+        <li>Фамилия - {{item.lastname}}</li>
+        <li>Имя - {{item.firstname}}</li><br>
+    {% endfor %}
+</ul>
+Добавить кнопки Удалить и Редактировать
+{% endblock %}
